@@ -1,8 +1,8 @@
-s# coding: utf-8
+# coding: utf-8
 
 
 def buttonhandle(sender):
-	print sender.name
+	#print sender.name
 	exec(sender.name+'()')
 
 def showsidebar():
