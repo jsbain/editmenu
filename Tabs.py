@@ -22,11 +22,11 @@ def edit_menu(sender):
 @ui.in_background    
 def check_tab():
     open_path = os.path.split(editor.get_path())[1]
-    for t in range(len(view.subviews)):
-        if view.subviews[t].name != open_path and view.subviews[t].background_color != 'white':
-            view.subviews[t].background_color = 'white'
-        if view.subviews[t].name == open_path:
-            view.subviews[t].background_color = 'orange'
+    for t in range(len(sv.subviews)):
+        if sv.subviews[t].name != open_path and sv.subviews[t].background_color != 'white':
+            sv.subviews[t].background_color = 'white'
+        if sv.subviews[t].name == open_path:
+            sv.subviews[t].background_color = 'orange'
 
 def add_new_button(name, new = False):
     b = ui.Button(title = str(name))
@@ -35,8 +35,8 @@ def add_new_button(name, new = False):
     b.border_width = 0.5
     b.corner_radius = 10
     if new == True:
-        for r in range(len(view.subviews)):
-            view.subviews[r].background_color = 'white'
+        for r in range(len(sv.subviews)):
+            sv.subviews[r].background_color = 'white'
         b.background_color = 'orange'
     else:
         b.background_color = 'white'
@@ -60,18 +60,18 @@ def add_new_button(name, new = False):
     c.image = ui.Image.named('ionicons-close-24')
     c.action = close_button
     b.add_subview(c)
-    view.add_subview(b)
+    sv.add_subview(b)
     count += 1
     
 def close_button(sender):
     marker = sender.superview.y
     tab = sender.superview
     tab_name = sender.superview.title
-    view.remove_subview(tab)
+    sv.remove_subview(tab)
     def move():
-        for i in range(len(view.subviews)):
-            if view.subviews[i].y > marker:
-                view.subviews[i].y -= tab_width*1.05
+        for i in range(len(sv.subviews)):
+            if sv.subviews[i].y > marker:
+                sv.subviews[i].y -= tab_width*1.05
     ui.animate(move, duration = 0.3)
     global count
     count -=1
@@ -110,7 +110,7 @@ def open_url(sender):
     current_tab = c.fetchall()
     if current_tab:
         current_tab = current_tab[0][0]
-        view[current_tab].background_color = 'white'
+        sv[current_tab].background_color = 'white'
     c.execute('''SELECT url FROM files WHERE name = ?''', (button_title,))
     path = c.fetchone()
     path = path[0]
@@ -122,9 +122,9 @@ def open_url(sender):
         global count
         count -= 1
         def move():
-            for i in range(len(view.subviews)):
-                if view.subviews[i].y > marker:
-                    view.subviews[i].y -= tab_width*1.05
+            for i in range(len(sv.subviews)):
+                if sv.subviews[i].y > marker:
+                    sv.subviews[i].y -= tab_width*1.05
         ui.animate(move, duration = 0.3)
         conn.commit()
         check_tab()
@@ -135,9 +135,10 @@ def open_url(sender):
 
 
 view = ui.load_view('Tabs')
-add_button = view['add_button']
-remove = view['remove']
-edit = view['edit']
+sv=view['scrollview1']
+add_button = sv['add_button']
+remove = sv['remove']
+edit = sv['edit']
 
 # Create database and table on first run and make tabs for all files in database on start
 first_time = False
