@@ -17,11 +17,7 @@ count = 0
 tab_width = 150
 
 def edit_menu(sender):
-    global editmenuview
-    try:
-        editmenuview.show()
-    except  NameError():
-        editmenuview=ui.load_view('editmenu')
+    editmenuclass.load_and_show()
 
 @ui.in_background    
 def check_tab():

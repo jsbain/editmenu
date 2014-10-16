@@ -6,7 +6,8 @@ import Find_and_replace
 INDENTSTR='    ' #4 spaces, pep8 preference
 
 class editmenuclass(ui.View):
-
+    _lastinstance=None
+            
     def handlebutton(self,sender):
         """handler for generic button tap.
             calls function that matches button name
@@ -21,6 +22,7 @@ class editmenuclass(ui.View):
             if isinstance(s,ui.Button):
                 #pass
                 s.action = self.handlebutton
+        type(self)._lastinstance=self
     def show(self):
         """show the sidebar. """
         self.present('sidebar')
@@ -135,6 +137,24 @@ class editmenuclass(ui.View):
         #import webbrowser
         Find_and_replace.showfindbar()
         #webbrowser.open('pythonista://site-packages%2Feditmenu%2FFind_and_replace.py?action=run')
+
+    @classmethod
+    def load(cls):
+        import os, inspect
+        pyui= os.path.abspath(inspect.getfile(inspect.currentframe()))+'ui'
+        
+        if cls._lastinstance is None:
+            cls._lastinstance = ui.load_view(pyui)
+        return cls._lastinstance
+    
+    @classmethod
+    def load_and_show(cls):
+        editmenuview=cls.load()
+        editmenuview.show()
+
+            
+            
 if __name__=='__main__':
-    editmenuview=ui.load_view('editmenu')
+    editmenuclass.load_and_show()
     editmenuview.show()
+
