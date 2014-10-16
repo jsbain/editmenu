@@ -18,7 +18,7 @@ class editmenuclass(ui.View):
         except AttributeError():
             console.hud_alert('bad button name')
     def did_load(self):
-        for s in self.subviews:
+        for s in self['scrollview1'].subviews:
             if isinstance(s,ui.Button):
                 #pass
                 s.action = self.handlebutton
@@ -27,8 +27,8 @@ class editmenuclass(ui.View):
         """show the sidebar. """
         self.present('sidebar')
 
-    # ##############################
-    #  the following are all button actions
+    # ###################################################
+    #  the following are all button actions, 
 
     def indent(self):
         """indent selected lines by one tab"""
@@ -127,6 +127,13 @@ class editmenuclass(ui.View):
         t=editor.get_text()
         editor.replace_text(i[0],i[1], clipboard.get())
         editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+    def cut(self):
+        import clipboard
+        i=editor.get_selection()
+        t=editor.get_text()
+        clipboard.set(t[i[0]:i[1]])
+        editor.replace_text(i[0],i[1], '')
+        editor.set_selection(i[0],i[0])
 
     def tabs(self):
         #import webbrowser
@@ -138,6 +145,8 @@ class editmenuclass(ui.View):
         Find_and_replace.showfindbar()
         #webbrowser.open('pythonista://site-packages%2Feditmenu%2FFind_and_replace.py?action=run')
 
+    ##################
+    #  classmethods to load/show 
     @classmethod
     def load(cls):
         import os, inspect
@@ -156,5 +165,4 @@ class editmenuclass(ui.View):
             
 if __name__=='__main__':
     editmenuclass.load_and_show()
-    editmenuview.show()
-
+ 
