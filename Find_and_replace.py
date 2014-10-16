@@ -55,24 +55,26 @@ def replace_it(sender):
         full_text = editor.get_text()
         full_replacement = full_text.replace(find_text, replacement)
         editor.replace_text(0, len(full_text), full_replacement)
-
-v = ui.load_view('Find_and_replace')
-
-find = v['find']
-find.autocapitalization_type = ui.AUTOCAPITALIZE_NONE
-find.delegate = FindField()
-
-replace = v['replace']
-replace.autocapitalization_type = ui.AUTOCAPITALIZE_NONE
-replace.delegate = ReplaceField()
-
-back = v['back']
-
-forward = v['forward']
-
-once_and_for_all = v['once_and_for_all']
-once_and_for_all.action = seg
-
-replace_button = v['replace_button']
-
-editor._set_toolbar(v)
+def showfindbar():
+	v = ui.load_view('Find_and_replace')
+	
+	find = v['find']
+	find.autocapitalization_type = ui.AUTOCAPITALIZE_NONE
+	find.delegate = FindField()
+	
+	replace = v['replace']
+	replace.autocapitalization_type = ui.AUTOCAPITALIZE_NONE
+	replace.delegate = ReplaceField()
+	
+	back = v['back']
+	
+	forward = v['forward']
+	
+	once_and_for_all = v['once_and_for_all']
+	once_and_for_all.action = seg
+	
+	replace_button = v['replace_button']
+	
+	editor._set_toolbar(v)
+if __name__=='__main__':
+    showfindbar()

@@ -6,6 +6,7 @@ import console
 import os
 from math import pi
 import webbrowser
+from editmenu import editmenuclass
 
 available_width = 500
 open_tabs = {}
@@ -16,7 +17,11 @@ count = 0
 tab_width = 150
 
 def edit_menu(sender):
-    webbrowser.open('pythonista://site-packages%2Feditmenu%2Feditmenu.py?action=run')
+    global editmenuview
+    try:
+        editmenuview.show()
+    except  NameError():
+        editmenuview=ui.load_view('editmenu')
 
 @ui.in_background    
 def check_tab():
@@ -132,6 +137,7 @@ def open_url(sender):
         sender.background_color = 'orange'
     conn.close()
 
+
 view = ui.load_view('Tabs')
 add_button = view['add_button']
 remove = view['remove']
@@ -159,4 +165,6 @@ check_tab()
 
 import clipboard
 clipboard.set(editor.get_path())
-
+	
+def tabs():
+    view.present('sidebar',hide_title_bar = True)

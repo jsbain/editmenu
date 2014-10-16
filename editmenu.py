@@ -1,129 +1,140 @@
 # coding: utf-8
-import editor
-from math import pi
+import editor, ui
+import Tabs
+import Find_and_replace
 
-def buttonhandle(sender):
-    """handler for generic button tap.
-        calls function that matches button name
-    """
-    #print sender.name
-    exec(sender.name+'()')
+INDENTSTR='    ' #4 spaces, pep8 preference
 
-def showsidebar():
-    """show the sidebar. """
-    import ui
-    v=ui.load_view('editmenu')
-    uncom = v['uncomment']
-    uncom.transform = ui.Transform.rotation(pi)
-    v.present('sidebar')
+class editmenuclass(ui.View):
 
-def indent():
-    """indent selected lines by one tab"""
-    import editor
-    import re
-    INDENTSTR='\t' #two spaces
-    i=editor.get_line_selection()
-    t=editor.get_text()
-    # replace every occurance of newline with  ewline plus indent, except last newline
-    editor.replace_text(i[0],i[1]-1,INDENTSTR+re.sub(r'\n',r'\n'+INDENTSTR,t[i[0]:i[1]-1]))
+    def handlebutton(self,sender):
+        """handler for generic button tap.
+            calls function that matches button name
+        """
+        try:
+            func=getattr(self,sender.name)
+            func()
+        except AttributeError():
+            console.hud_alert('bad button name')
+    def did_load(self):
+        for s in self.subviews:
+            if isinstance(s,ui.Button):
+                #pass
+                s.action = self.handlebutton
+    def show(self):
+        """show the sidebar. """
+        self.present('sidebar')
 
+    # ##############################
+    #  the following are all button actions
 
-    editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+    def indent(self):
+        """indent selected lines by one tab"""
+        import editor
+        import re
 
-def unindent():
-    """unindent selected lines all the way"""
-    import editor
-    import textwrap
+        i=editor.get_line_selection()
+        t=editor.get_text()
+        # replace every occurance of newline with  newline plus indent, except last newline
+        editor.replace_text(i[0],i[1]-1,INDENTSTR+re.sub(r'\n',r'\n'+INDENTSTR,t[i[0]:i[1]-1]))
 
-    i=editor.get_line_selection()
-    t=editor.get_text()
+        editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
 
-    editor.replace_text(i[0],i[1], textwrap.dedent(t[i[0]:i[1]]))
+    def unindent(self):
+        """unindent selected lines all the way"""
+        import editor
+        import textwrap
 
-    editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+        i=editor.get_line_selection()
+        t=editor.get_text()
 
-def comment():
-    """" comment out selected lines"""
-    import editor
-    import re
-    COMMENT='#'
-    i=editor.get_line_selection()
-    t=editor.get_text()
-    # replace every occurance of newline with  ewline plus COMMENT, except last newline
-    editor.replace_text(i[0],i[1]-1,COMMENT+re.sub(r'\n',r'\n'+COMMENT,t[i[0]:i[1]-1]))
+        editor.replace_text(i[0],i[1], textwrap.dedent(t[i[0]:i[1]]))
 
-    editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+        editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
 
-def uncomment():
-    """" uncomment selected lines"""
-    import editor
-    import re
-    COMMENT='#'
-    i=editor.get_line_selection()
-    t=editor.get_text()
-# replace every occurance of newline # with newline, except last newline
-#  todo.. probably should verify every line has comment...
-#  num lines= re.findall
+    def comment(self):
+        """" comment out selected lines"""
+        import editor
+        import re
+        COMMENT='#'
+        i=editor.get_line_selection()
+        t=editor.get_text()
+        # replace every occurance of newline with  ewline plus COMMENT, except last newline
+        editor.replace_text(i[0],i[1]-1,COMMENT+re.sub(r'\n',r'\n'+COMMENT,t[i[0]:i[1]-1]))
 
-    if all( [x.startswith('#') for x in t[i[0]:i[1]-1].split(r'\n')]):
-        editor.replace_text(i[0],i[1]-1,re.sub(r'^'+COMMENT,r'',t[i[0]:i[1]-1],flags=re.MULTILINE))
+        editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
 
-    editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+    def uncomment(self):
+        """" uncomment selected lines"""
+        import editor
+        import re
+        COMMENT='#'
+        i=editor.get_line_selection()
+        t=editor.get_text()
+    # replace every occurance of newline # with newline, except last newline
 
-def execlines():
-    """execute selected lines in console.   """
-    import editor
-    import textwrap
+        if all( [x.startswith('#') for x in t[i[0]:i[1]-1].split(r'\n')]):
+            editor.replace_text(i[0],i[1]-1,re.sub(r'^'+COMMENT,r'',t[i[0]:i[1]-1],flags=re.MULTILINE))
 
-    a=editor.get_text()[editor.get_line_selection()[0]:editor.get_line_selection()[1]]
+        editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
 
-    exec(textwrap.dedent(a))
+    def execlines(self):
+        """execute selected lines in console.   """
+        import editor
+        import textwrap
 
-def selectstart():
-    import editor
-    i=editor.get_selection()
-    editor.set_selection(i[0],i[1]+1)
+        a=editor.get_text()[editor.get_line_selection()[0]:editor.get_line_selection()[1]]
 
-def finddocstring():
-    ''' find the docstring at current cursor location
-    '''
-    import StringIO
-    from jedi import Script
+        exec(textwrap.dedent(a))
 
-    i=editor.get_selection()
-    t=editor.get_text()
-    (line,txt)=[(line,n) for (line,n) in enumerate(StringIO.StringIO(editor.get_text()[:i[1]]))][-1]
-    script = Script(t, line+1, len(txt))
+    def selectstart(self):
+        import editor
+        i=editor.get_selection()
+        editor.set_selection(i[0],i[1]+1)
 
-    dfn = script.goto_definitions()
-    if dfn:
-        doc=dfn[0].doc
-        import ui
-        v=ui.TextView()
-        v.width=100
-        v.height=50
-        v.text=doc
-        editor._set_toolbar(v)
+    def finddocstring(self):
+        ''' find the docstring at current cursor location
+        '''
+        import StringIO
+        from jedi import Script
 
-def copy():
-    import clipboard
-    i=editor.get_selection()
-    t=editor.get_text()
-    clipboard.set(t[i[0]:i[1]])
+        i=editor.get_selection()
+        t=editor.get_text()
+        (line,txt)=[(line,n) for (line,n) in enumerate(StringIO.StringIO(editor.get_text()[:i[1]]))][-1]
+        script = Script(t, line+1, len(txt))
 
-def paste():
-    import clipboard
-    i=editor.get_selection()
-    t=editor.get_text()
-    editor.replace_text(i[0],i[1], clipboard.get())
-    editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
-    
-def tabs():
-    import webbrowser
-    webbrowser.open('pythonista://site-packages%2Feditmenu%2Tabs.py?action=run')
-    
-def find_and_replace():
-    import webbrowser
-    webbrowser.open('pythonista://site-packages%2Feditmenu%2FFind_and_replace.py?action=run')
+        dfn = script.goto_definitions()
+        if dfn:
+            doc=dfn[0].doc
+            import ui
+            v=ui.TextView()
+            v.width=100
+            v.height=50
+            v.text=doc
+            editor._set_toolbar(v)
 
-showsidebar()
+    def copy(self):
+        import clipboard
+        i=editor.get_selection()
+        t=editor.get_text()
+        clipboard.set(t[i[0]:i[1]])
+
+    def paste(self):
+        import clipboard
+        i=editor.get_selection()
+        t=editor.get_text()
+        editor.replace_text(i[0],i[1], clipboard.get())
+        editor.set_selection(i[0],i[1]-len(t)+len(editor.get_text()))
+
+    def tabs(self):
+        #import webbrowser
+        Tabs.tabs()
+        #webbrowser.open('pythonista://site-packages%2Feditmenu%2Tabs.py?action=run')
+
+    def find_and_replace(self):
+        #import webbrowser
+        Find_and_replace.showfindbar()
+        #webbrowser.open('pythonista://site-packages%2Feditmenu%2FFind_and_replace.py?action=run')
+if __name__=='__main__':
+    editmenuview=ui.load_view('editmenu')
+    editmenuview.show()
