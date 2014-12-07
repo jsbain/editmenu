@@ -7,7 +7,9 @@ import os
 from math import pi
 import webbrowser
 from editmenu import editmenuclass
-
+import inspect
+base=os.path.dirname(inspect.getframeinfo(inspect.currentframe())[0])
+tabdb=os.path.join(base,'tabs.db')
 available_width = 500
 open_tabs = {}
 num_of_tabs = 0
@@ -75,7 +77,7 @@ def close_button(sender):
     ui.animate(move, duration = 0.3)
     global count
     count -=1
-    conn = sql.connect('tabs.db')
+    conn = sql.connect(tabdb)
     conn.text_factory = str
     c = conn.cursor()
     c.execute('DELETE FROM files WHERE name = ?', (tab_name,))
@@ -85,7 +87,7 @@ def close_button(sender):
 @ui.in_background
 def add_file(sender):
     current_path = str(editor.get_path())
-    conn = sql.connect('tabs.db')
+    conn = sql.connect(tabdb)
     c = conn.cursor()
     name = os.path.split(current_path)[1]
     c.execute('''select url from files where name = ?''', (name,))
@@ -102,7 +104,7 @@ def add_file(sender):
 # Open file when tab is pressed
 def open_url(sender):
     current_path = editor.get_path()
-    conn = sql.connect('tabs.db')
+    conn = sql.connect(tabdb)
     conn.text_factory = str
     c = conn.cursor()
     button_title = sender.title
@@ -134,6 +136,8 @@ def open_url(sender):
     conn.close()
 
 
+
+
 view = ui.load_view('Tabs')
 sv=view['scrollview1']
 add_button = sv['add_button']
@@ -143,9 +147,9 @@ edit = sv['edit']
 # Create database and table on first run and make tabs for all files in database on start
 first_time = False
 current_path = editor.get_path()
-if not os.path.isfile('tabs.db'):
+if not os.path.isfile(tabdb):
     first_time = True
-conn = sql.connect('tabs.db')
+conn = sql.connect(tabdb)
 conn.text_factory = str
 c = conn.cursor()
 if first_time == True:
