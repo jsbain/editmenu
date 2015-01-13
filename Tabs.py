@@ -75,7 +75,7 @@ class Tabs(ui.View):
         def move():
             for i in range(len(self.sv.subviews)):
                 if self.sv.subviews[i].y > marker:
-                    self.sv.subviews[i].y -= tab_width*1.05
+                    self.sv.subviews[i].y -= self.tab_width*1.05
         ui.animate(move, duration = 0.3)
         self.count-=1
         del(self.d[tab_name])
@@ -129,7 +129,7 @@ class Tabs(ui.View):
             def move():
                 for i in range(len(sv.subviews)):
                     if sv.subviews[i].y > marker:
-                        sv.subviews[i].y -= tab_width*1.05
+                        sv.subviews[i].y -= self.tab_width*1.05
             ui.animate(move, duration = 0.3)
     
             self.check_tab()
