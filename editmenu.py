@@ -1,7 +1,7 @@
  # coding: utf-8
 import editor, ui
 import Find_and_replace
-
+import Tabs
 INDENTSTR='    ' #4 spaces, pep8 preference
 
 class editmenuclass(ui.View):
@@ -136,7 +136,7 @@ class editmenuclass(ui.View):
 
     def tabs(self):
         #import webbrowser
-        import Tabs
+
         Tabs.tabs()
         #webbrowser.open('pythonista://site-packages%2Feditmenu%2Tabs.py?action=run')
 

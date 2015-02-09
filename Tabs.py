@@ -10,15 +10,14 @@ import inspect
 import shelve
 from collections import namedtuple
 
+import editmenu
 def edit_menu(sender):
-    import editmenu
     editmenu.editmenuclass.load_and_show()
 class Tabs(ui.View):
     _lastinstance=None
     tab_height = 45
     count = 0
     tab_width = 150
-
 
     @ui.in_background    
     def check_tab(self):
@@ -65,6 +64,8 @@ class Tabs(ui.View):
         c.action = self.close_button
         b.add_subview(c)
         self.sv.add_subview(b)
+        contentwidth,contentheight=self.sv.content_size
+        self.sv.content_size=(contentwidth,(b.y+b.height)*1.6)
         self.count += 1
         
     def close_button(self,sender):
@@ -188,7 +189,7 @@ class Tabs(ui.View):
         for tab in d.itervalues():
             self.add_new_button(tab['name'])
         self.d=d
-        self.present('sidebar', hide_title_bar = True)
+        self.present('sidebar')
         self.check_tab()
         type(self)._lastinstance=self
     
