@@ -122,18 +122,8 @@ class Tabs(ui.View):
         path=new_tab['path']
         if not os.path.isfile(path):
             console.hud_alert('The file for this tab has been moved, renamed, or deleted. the tab will now be removed.', icon = 'error', duration = 3)
-            marker = sender.y
-            self.view.remove_subview(sender)
-            del(d[button_title])
-    
-            self.count -= 1
-            def move():
-                for i in range(len(sv.subviews)):
-                    if sv.subviews[i].y > marker:
-                        sv.subviews[i].y -= self.tab_width*1.05
-            ui.animate(move, duration = 0.3)
-    
-            self.check_tab()
+            self.close_button(sender)
+
         else:
             editor.open_file(path)
             def setsel():
